@@ -1,0 +1,6 @@
+[book]
+authors = ["Lukas Froehlich"]
+language = "en"
+multilingual = false
+src = "src"
+title = "range-v3 Documentation"
