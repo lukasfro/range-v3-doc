@@ -102,7 +102,7 @@ If you try to compile the following example, you will get a cryptic error messag
 const std::vector<int> vec{1, 2, 3, 4, 5};
 // Does not compile with `const` in front
 const auto rng = vec | ranges::views::filter([](const int i) { return i % 2; });
-std::cout << rng << std::endl;
+std::cout << rng << '\n';
 ```
 
 Only when you remove the `const` at the declaration of `rng`, you should obtain the expected result and the program prints: `[1, 3, 5]`.
@@ -121,6 +121,37 @@ rng = vec | ranges::views::filter([](const int i) { return i % 2; });
 ```
 
 To summarize: While it is generally recommended to declare immutable variables as `const`, this is not necessary for views.
+
+### Immutable Views of Mutable Data
+
+Consider the following example:
+
+```cpp
+std::vector<int> vec1{1, 2, 3};
+std::vector<int> vec2{2, 3, 4};
+for (const auto &[e1, e2] : rv::zip(vec1, vec2)) {
+  e2 = 3;  // ?!
+}
+```
+
+Would you assume that this code compiles?
+In fact, it does and as expected, the values in `vec2` are all set to 3 after the loop.
+But how can this be?
+In the range-based `for`-loop you declare the destructed elements `e1` and `e2` as const references.
+
+TODO: Understand the fundamental reasons for this behavior of the `zip` view.
+
+In order to fix this issue, we can make use of the `const_` range adaptor so that we get an error at compile time in case we do not want to accidentally modify the elements of `vec1` and `vec2`:
+
+```cpp
+std::vector<int> vec1{1, 2, 3};
+std::vector<int> vec2{2, 3, 4};
+for (const auto &[e1, e2] : rv::zip(vec1, vec2) | rv::const_) {
+  e2 = 3;  // does not compile with "error: assignment of read-only reference `e2`"
+}
+```
+
+> **Note:** This issue does not occur with all range adaptors, but at least with `zip` and `enumerate`, which is effectively a wrapper around `zip`.
 
 ### Adaptors Can Change View Type
 
