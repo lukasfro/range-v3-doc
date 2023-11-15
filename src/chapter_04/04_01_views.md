@@ -8,12 +8,11 @@ Checklist for examples:
 - [ ] Use `'\n'` for break line
 - [ ] Add a note for all variadic templates (see `cartesian_product`)
 
-### Adjacent Filter
+### `views::adjacent_filter`
 
 The `adjacent_filter` view is a range adaptor that filters a range based on a binary predicate. The predicate function acts on two adjacent elements in the input range and removes the *second* element if the predicate returns `false`.
 
-> [!NOTE] Note
-> Independent of the predicate, the *first* element of the input range is always included in the result.
+> **Note:** Independent of the predicate, the *first* element of the input range is always included in the result.
 
 Here's an example of how to use `ranges::views::adjacent_filter` to remove non-unique elements from a range:
 ```cpp
@@ -23,12 +22,11 @@ std::cout << rng << '\n';
 // prints: [0,1,2,3,4,5]
 ```
 
-### Adjacent Remove If
+### `views::adjacent_remove_if`
 
 The `adjacent_remove_if` view is a range adaptor that filters a range based on a binary predicate. The predicate function acts on two adjacent elements in the input range and removes the *first* element if the predicate returns `true`.
 
-> [!NOTE] Note
-> Independent of the predicate, the *last* element of the input range is always included in the result.
+> **Note:** Independent of the predicate, the *last* element of the input range is always included in the result.
 
 Here's an example of how to use `ranges::views::adjacent_remove_if` to remove non-unique elements from a range:
 ```cpp
@@ -38,7 +36,7 @@ std::cout << rng << '\n';
 // prints: [0,1,2,3,4,5]
 ```
 
-### All
+### `views::all`
 
 The `all` view is a range adaptor that simply returns a unmodified view to the source range. That way, you can copy the view to a range at constant cost or directly print the content of a container.
 
@@ -46,11 +44,11 @@ Here's an example of how to use `ranges::views::all` to print the elements of a 
 
 ```cpp
 const std::vector<int> vec = {1, 2, 3, 4, 5};
-auto rng = vec | rv::all; 
+auto rng = vec | rv::all;
 std::cout << rng << '\n';  // prints: [1,2,3,4,5]
 ```
 
-### C-String
+### `views::c_str`
 
 The `c_str` view is a range adaptor that creates a null-terminated C-style string representation of the input range, such as a `const char*`.
 
@@ -62,10 +60,9 @@ auto rng = rv::c_str(s.c_str());
 std::cout << rng << '\n';  // prints: [t,e,s,t]
 ```
 
-> [!NOTE] Note
-> Note that the `c_str` view does not have a pipe operator and hence the input range needs to be passed via the standard parentheses syntax.
+> **Note:** The `c_str` view does not have a pipe operator and hence the input range needs to be passed via the standard parentheses syntax.
 
-### Cache1
+### `views::cache1`
 
 The `cache1` view caches the last element in the input view. That way, dereferencing a range's iterator multiple times does not lead to a recomputation.
 
@@ -85,7 +82,7 @@ auto rng_begin = ranges::begin(rng);
 
 Note that in the example above, without the use of the `cache1` view, the program would have printed two lines with the same content. This is because views of ranges are evaluated lazily.
 
-### Cartesian Product
+### `views::cartesian_product`
 
 The `cartesian_product` view is a range adaptor that generates the [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of two or more ranges. Formally, the (n-fold) Cartesian product is defined as the set of all possible ordered tuples that can be formed by choosing one element from each of the input sets.
 
@@ -106,10 +103,9 @@ for (const auto [x, y] : pairs) {
 ```
 
 
-> [!NOTE] Note
-> The `cartesian_product` view makes use of variadic templates so that we can pass an arbitrary number of ranges to it. As a consequence, it does not provide the pipe-operator.
+> **Note:** The `cartesian_product` view makes use of variadic templates so that we can pass an arbitrary number of ranges to it. As a consequence, it does not provide the pipe-operator.
 
-### Chunk  and Chunk-By
+### `views::chunk` and `views::chunk_by`
 
 The `chunk`  and `chunk_by` views are range adaptors that group elements of a range into contiguous sequences of elements ("chunks") of a specified size or whether they fulfill a binary predicate.  When specifying a fixed chunk size `N`, the last sequence in the output range may have fewer elements than `N` if the number of elements in the original range is not divisible by `N` without remainder.
 
@@ -118,7 +114,7 @@ Here's an example of how you can use the `chunk` view to group elements of a ran
 ```cpp
 auto rng = rv::iota(1, 9);
 auto chunk_rng = rng | rv::chunk(3);
-std::cout << chunk_rng << std::endl;  // prints: [[1,2,3],[4,5,6],[7,8]]
+std::cout << chunk_rng << '\n';  // prints: [[1,2,3],[4,5,6],[7,8]]
 ```
 
 Here's an example of how you can use the `chunk_by` view to group elements that do not differ from each other too much:
@@ -126,61 +122,50 @@ Here's an example of how you can use the `chunk_by` view to group elements that 
 ```cpp
 const std::vector<int> vec{1, 1, 2, 5, 4, 9};
 auto rng = vec | rv::group_by([](int i, int j) { return std::abs(i - j) <= 2; });
-std::cout << rng << std::endl;  // prints: [[1,1,2], [5,4], [9]]
+std::cout << rng << '\n';  // prints: [[1,1,2], [5,4], [9]]
 ```
 
+### `views::common`
 
-### Common
+> **TODO:** Fill with content.
 
-> [!TODO] To-Do
-> Fill with content.
+From the official documentation: *"Convert the source range to a common range, where the type of the end is the same as the begin. Useful for calling algorithms in the std:: namespace."*
 
-From official documentation: "Convert the source range to a common range, where the type of the end is the same as the begin. Useful for calling algorithms in the std:: namespace."
-### Concat
+### `views::concat`
 
-The `concat` view is an adaptor view that concatenates multiple input ranges into a single output range. Here's an example of how you can use the `concat` view:
-
-TODO: the example below is not good! it should be `rv::concat(rng1, rng2, rng3)` 
+The `concat` view is a range adaptor that concatenates multiple sources ranges into a single range.
+Here's an example of how you can use the `concat` view:
 
 ```cpp
 auto rng1 = rv::iota(1, 4);
 auto rng2 = rv::iota(4, 7);
 auto rng3 = rv::iota(7, 10);
-std::vector<decltype(rng1)> rng_vec = {rng1, rng2, rng3};
-auto concat_rng = rv::concat(rng_vec);
-std::cout << concat_rng << std::endl;  // prints: [[1,2,3],[4,5,6],[7,8,9]]
+auto rng = rv::concat(rng1, rng2, rng3);
+std::cout << rng << '\n';  // prints: [1,2,3,4,5,6,7,8,9]
 ```
 
-In this example, we create three ranges `rng1`, `rng2`, and `rng3` using the `iota` view, which generates ranges of integers from 1 to 3, 4 to 6, and 7 to 9, respectively. We then create a `std::vector` `rng_vec` that contains these three ranges.
+> **Note:** The `concat` view makes use of variadic templates so that we can pass an arbitrary number of ranges to it. As a consequence, it does not provide the pipe-operator.
 
-We then use the `concat` function directly to create a new range `concat_rng` that concatenates the elements of the three input ranges into a single output range. Note that we had to call the `concat` view just like a standard function and could not use the pipe operator (`|operator`). The following code does not compile: `rng_vec | rv::concat`.
+> **Note:** There is another range adaptor that combines multiple ranges into a single range, that is the `join` view. The difference is that `concat` takes multiple sources ranges, whereas `join` takes a range of ranges as a source.
 
-TODO: Find out the explanation why we cannot use the pipe operator.
+### `views::const_`
 
-NOTE:
+The `const_` view is a range adaptor that creates a new range containing the same elements as the original range, but with each element cast to a const reference.
+This is useful when you want to create a immutable view over a mutable range such as a vector.
 
-There is another adaptor view that combines multiple input ranges into a single output range, that is the `join` view. Check the coresponding example on how to use the `join` view.
-
-### Const 
-
-The `const_` view is an adaptor view that creates a new range containing the same elements as the original range, but with each element cast to a const reference. This means that any changes to the original elements will be reflected in the const range. For example, if you modify an element in the original range, that modification will also be visible in the const range.
-
-Here's an example of how you can use the `const` view:
+Here's an example of how you can use the `const` view to avoid accidentally modifying elements in a mutable range:
 
 ```cpp
-std::vector<int> vec{1, 2, 3};
-auto const_rng = vec | rv::const_;
-// const_rng[0] = 4; // this would cause a compile error
-std::cout << const_rng << std::endl;  // prints: [1, 2, 3]
-vec.at(0) = 0;
-std::cout << const_rng << std::endl;  // prints: [0, 2, 3]
+std::vector<int> vec{1, 2, 3};  // mutable (!)
+auto rng = vec | rv::const_;
+// rng[0] = 0; // this would cause a compile error
+vec[0] = 0;  // works just as expected
+std::cout << rng << '\n';  // prints: [0, 2, 3]
 ```
 
-In this program, we first create a `std::vector` `vec` that contains the integers 1, 2, and 3. We then use the `const_` view to create a new range `const_rng` that is const-qualified and prevents modification of its elements. Attempting to modify the first element of the `const_rng` would lead to a compile-time error.
+> **Note:** (Im)mutability with views can be a bit confusing. See the following hints to avoid potential pitfalls: TODO: link to appropriate examples in the "pitfalls" section.
 
-Finally, when we modify the first element of the original vector `vec`. Since the `const_rng` is a view over the original `vec` vector, any changes made to the `vec` will be reflected in `const_rng`. So, the output at this point would be `[0, 2, 3]`.
-
-### Counted
+### `views::counted`
 
 The `counted` view is an adaptor view, which allows you to create a range of specified number of elements, starting from a given iterator. The `counted` view can be useful when you want to work with a portion of a range or a sequence that might not have a well-defined end. It takes an iterator and a count, and creates a view that includes exactly the specified number of elements starting from the given iterator.
 
